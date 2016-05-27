@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta name="Zhonghao Wang" content="unmute user data analyse">
+  <!-- Viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Minified CSS -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+  
+
+  <title>Analyse the unmute data</title>
+  
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    
+<style>
+    button{
+        margin: 0px 10px 0px 10px;
+    }
+    
+    .container{
+        margin-top: 100px;
+    }
+    
+    #timeButtons{
+        visibility: hidden;
+    }
+</style>
+<script>
+      var timeStamp;
+    $(document).ready(function() {
+       
+       $("#fileForm").submit(function(event){
+           event.preventDefault();
+           var name=document.getElementById("fileUpload").value;
+           console.log(name);
+           if(name.length<1){
+               alert("Please upload a csv file.");
+               return;
+           }
+           var result=name.indexOf(".csv");
+          
+           if(result<0) {
+            alert("Invalid file.");
+               $("#timeButtons").css("visibility","hidden");
+               return;
+           }
+           console.log(result);
+           console.log(result);
+           console.log(name);
+           var fd=new FormData($(this)[0]);
+            $.ajax({
+                type:'POST',
+                url:"http://unmute2-env.us-west-2.elasticbeanstalk.com/",
+                data:fd,
+                processData: false,  
+                contentType: false,   
+                success: function(data){
+                   alert("File is uploaded");
+                   timeStamp=data;
+                    $("#timeButtons").css("visibility","visible");
+                }   
+            });
+          
+        });
+        
+        
+       $("#pastDay").click(function(){
+           var d =new Date();
+            console.log(d.toLocaleDateString());
+           d.setHours(0,0,0,0);
+           var startdate=d.setDate(d.getDate()-1);
+           
+           console.log(startdate);
+           console.log(d.toLocaleDateString());
+          var enddate=d.setDate(d.getDate()+1);
+           console.log(enddate);
+           console.log(d.toLocaleDateString());
+           
+           url = "/public/pastday.html/?filename="+timeStamp+"&startdate="+startdate+"&enddate="+enddate; 
+           window.open(url,'blank');
+       });
+        
+        $("#lastWeek").click(function(){
+           var d =new Date();
+            console.log(d.toLocaleDateString());
+           d.setHours(0,0,0,0);
+           var startdate=d.setDate(d.getDate()-7);
+           
+           console.log(startdate);
+           console.log(d.toLocaleDateString());
+          var enddate=d.setDate(d.getDate()+7);
+           console.log(enddate);
+           console.log(d.toLocaleDateString());
+           
+         
+           url = "/public/lastweek.html/?filename="+timeStamp+"&startdate="+startdate+"&enddate="+enddate; 
+           window.open(url,'blank');
+       });
+        
+        $("#lastMonth").click(function(){
+           var d =new Date();
+            console.log(d.toLocaleDateString());
+           d.setHours(0,0,0,0);
+           d.setDate(1);
+         
+           d.setMonth(d.getMonth()-1);
+           var startdate=d.getTime();
+           
+           console.log(d);
+           console.log(d.toLocaleDateString());
+            d.setDate(0);
+            d.setMonth(d.getMonth()+1);
+          var enddate=d.getTime();
+           console.log(enddate);
+           console.log(d.toLocaleDateString());
+           
+          
+           url = "/public/lastmonth.html/?filename="+timeStamp+"&startdate="+startdate+"&enddate="+enddate; 
+           window.open(url,'blank');
+       });
+        
+        $("#allTime").click(function(){
+           url = "/public/alltime.html/?filename="+timeStamp; 
+           window.open(url,'blank');
+       });
+    });
+   
+</script>
+</head>
+<body>	
+
+    <div class="container">
+    
+    <form id="fileForm" class="form-inline" style="text-align : center; margin: 0 auto;width: 400px;" id="uploadForm" enctype="multipart/form-data" action="/" method="post">
+        <fieldset> 
+        <h1>Analyze Unmute Users</h1>
+        <br><br><br><br>
+        <p>Please upload a .csv file</p>
+        <div class="form-group">
+            <input id="fileUpload" style="margin:0 0 0 100px;" type="file" name="userFile"/>
+        </div>
+            <br><br>
+        <div class="form-group">
+            <button class="btn btn-primary btn-sm" type="submit" value="Upload file" name="submit">Upload</button>
+        </div>
+     </fieldset>
+    </form>
+        
+    <br><br>
+        
+        <div id="timeButtons" style="text-align:center;">
+            <button id="pastDay" class="btn btn-success btn-sm"  name="pastDay">Past Day</button>
+            <button id="lastWeek" class="btn btn-success btn-sm"  name="lastWeek">Last Week</button>
+            <button id="lastMonth" class="btn btn-success btn-sm" name="lastMonth">Last Month</button>
+            <button id="allTime" class="btn btn-success btn-sm"  name="allTime">All Time</button>
+        </div>
+    
+    
+    </div>
+</body>
+</html>

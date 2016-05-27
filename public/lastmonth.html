@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta name="Zhonghao Wang" content="unmute user data analyse">
+  <!-- Viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Minified CSS -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+  <!-- Optional theme -->
+
+  <title>Analyse the unmute data</title>
+  
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+<style>
+    th,td{
+        text-align:center;
+    }
+</style>
+<script>
+      var timeStamp;
+    $(document).ready(function() {
+        
+       
+      
+        
+      function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+      }
+        
+        var filename = getParameterByName('filename'); 
+        var startdate = getParameterByName('startdate');
+        var enddate = getParameterByName('enddate');
+        
+        ajaxRequestData();
+        
+        function ajaxRequestData(){
+             $.ajax({
+                type:"GET",
+                url:"http://unmute2-env.us-west-2.elasticbeanstalk.com/datarequest/",
+                data:{filename:filename,startdate:startdate,enddate:enddate},
+                dataType:"json",
+                success:function(data){
+                  if (data.length<1) {
+                      $("#dataTable").append("<tr><td colspan='4'><h3>No user data in this time range<td><h3></tr>");
+                  }
+                  else{
+                    for(var i=0;i<data.length;i++){
+                        $("#dataTable").append("<tr><td>"+data[i].id+"</td><td>"+data[i].count+"</td><td>"+
+                                              data[i].userSearch+"</td><td>"+data[i].streamLength+"</td></tr>");
+                    }
+                  }
+                }   
+            })
+        }
+    });
+   
+</script>
+</head>
+<body>	
+
+    <div class="container" style="text-align:center">
+     <h1>Active users ranking in last month</h1><br>
+        <div class="table-responsive">
+            <table class="table table-striped" id="dataTable">
+                <tr>
+                  <th>User Id</th>
+                  <th>Call times</th>
+                  <th>User Search</th>
+                  <th>Total call duration</th>   
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
